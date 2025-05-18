@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Line Chart{% endblock %}
+
+{% block content %}
+    <main class="dashboard">
+        <h1>Line Chart Visualization</h1>
+
+        <div class="chart-section">
+            <!-- Line Chart Container -->
+            <div class="chart-box">
+                <canvas id="lineChart"></canvas>
+            </div>
+
+            <!-- CRUD Panel (Separated from Chart) -->
+            <div class="crud-panel">
+                <h2>Manage Data</h2>
+
+                <!-- Form -->
+                <form id="chartForm">
+                    <input type="text" id="category" placeholder="Category">
+                    <input type="number" id="value" placeholder="Value">
+                    <select id="chartType">
+                        <option value="line1">Line 1</option>
+                        <option value="line2">Line 2</option>
+                        <option value="line3">Line 3</option>
+                        <option value="line4">Line 4</option>
+                        <option value="line5">Line 5</option>
+                    </select>
+                    <button type="button" class="add-btn" onclick="addChart()">Add</button>
+                </form>
+
+                <!-- Table for Chart Data -->
+                <table id="chartTable">
+                    <tr>
+                        <th>Category</th>
+                        <th>Value</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            // ✅ Restore Dropdown Selection After Reload
+            const savedChartType = localStorage.getItem("selectedChartType") || "line1";
+            document.getElementById("chartType").value = savedChartType;
+
+            // ✅ Fetch Data from API
+            const response = await fetch("/dept1/api/chart-data/");
+            const data = await response.json();
+
+            const lineData = [
+                data.filter(item => item.chart_type === "line1"),
+                data.filter(item => item.chart_type === "line2"),
+                data.filter(item => item.chart_type === "line3"),
+                data.filter(item => item.chart_type === "line4"),
+                data.filter(item => item.chart_type === "line5")
+            ];
+
+            // ✅ Define Colors for 5 Lines
+            const colors = ['#36a2eb', '#ff6384', '#ffce56', '#4bc0c0', '#9966ff'];
+
+            // ✅ Generate Datasets for Multiple Lines
+            const datasets = lineData.map((dataset, index) => ({
+                label: `Line ${index + 1}`,
+                data: dataset.map(item => item.value),
+                borderColor: colors[index],
+                fill: false
+            }));
+
+            // ✅ Render Chart with Multiple Lines
+            new Chart(document.getElementById('lineChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: lineData[0].map(item => item.category), // Use Line 1 categories
+                    datasets: datasets // Apply datasets dynamically
+                }
+            });
+
+            // ✅ Populate Table
+            const table = document.getElementById("chartTable");
+            table.innerHTML = "<tr><th>Category</th><th>Value</th><th>Type</th><th>Actions</th></tr>";
+
+            lineData.flat().forEach(item => {
+                const row = table.insertRow();
+                row.insertCell(0).innerText = item.category;
+                row.insertCell(1).innerText = item.value;
+                row.insertCell(2).innerText = item.chart_type.replace("line", "Line ");
+                row.insertCell(3).innerHTML = `
+                    <button class="edit-btn" onclick="editChart(${item.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteChart(${item.id})">Delete</button>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Error fetching chart data:", error);
+        }
+    });
+
+    // ✅ Save Dropdown Selection Before Adding Data
+    document.getElementById("chartType").addEventListener("change", function () {
+        localStorage.setItem("selectedChartType", this.value);
+    });
+
+    // ✅ Add Chart Data
+    async function addChart() {
+        const category = document.getElementById("category").value;
+        const value = document.getElementById("value").value;
+        const chartType = document.getElementById("chartType").value;
+
+        localStorage.setItem("selectedChartType", chartType); // ✅ Keeps selection after reload
+
+        await fetch("/dept1/api/chart-data/add/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category, value, chart_type: chartType })
+        });
+
+        location.reload();
+    }
+
+    // ✅ Edit Chart Data
+    async function editChart(id) {
+        const category = prompt("Enter new category:");
+        const value = prompt("Enter new value:");
+
+        await fetch(`/dept1/api/chart-data/update/${id}/`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category, value })
+        });
+
+        location.reload();
+    }
+
+    // ✅ Delete Chart Data
+    async function deleteChart(id) {
+        await fetch(`/dept1/api/chart-data/delete/${id}/`, {
+            method: "DELETE"
+        });
+
+        location.reload();
+    }
+    </script>
+{% endblock %}

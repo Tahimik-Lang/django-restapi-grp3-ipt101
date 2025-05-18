@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Dashboard{% endblock %}
+
+{% block content %}
+    <h1 class="dashboard-title">Dashboard</h1>
+
+    <div class="container-grid">
+        <div class="chart-box">
+            <h3>Pie Chart</h3>
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Bar Chart</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>Doughnut Chart</h3>
+            <canvas id="doughnutChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Line Chart</h3>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+
+<!--<form id="chartForm">-->
+<!--    <input type="text" id="category" placeholder="Category">-->
+<!--    <input type="number" id="value" placeholder="Value">-->
+<!--    <input type="text" id="chart_type" placeholder="Chart Type"> &lt;!&ndash; New text box &ndash;&gt;-->
+<!--    <button type="button" class="add-btn" onclick="addChart()">Add</button>-->
+<!--</form>-->
+
+    <form id="chartForm" style="margin: 20px auto; max-width: 400px; display: flex; gap: 10px; align-items: center;">
+        <input type="text" id="category" placeholder="Category" required>
+        <input type="number" id="value" placeholder="Value" required>
+        <select id="chart_type" required>
+            <option value="" disabled selected>Select Chart Type</option>
+            <option value="pie">Pie</option>
+            <option value="bar">Bar</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="line1">Line 1</option>
+            <option value="line2">Line 2</option>
+            <option value="line3">Line 3</option>
+            <option value="line4">Line 4</option>
+            <option value="line5">Line 5</option>
+        </select>
+        <button type="button" class="add-btn" onclick="addChart()">Add</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            // ✅ Fetch Data from API
+            const response = await fetch("{% url 'chart_data_api' %}");
+            const data = await response.json();
+
+            // ✅ Define Color Palette
+            const colors = [
+                '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0',
+                '#9966ff', '#ff9f40', '#ffcd56', '#c9cbcf',
+                '#7dd3fc', '#c0ca33'
+            ];
+
+            function getColors(data) {
+                return data.map((_, index) => colors[index % colors.length]);
+            }
+
+            // ✅ Process Chart Data
+            const pieData = data.filter(item => item.chart_type === "pie");
+            const barData = data.filter(item => item.chart_type === "bar");
+            const doughnutData = data.filter(item => item.chart_type === "doughnut");
+            const lineData = [
+                data.filter(item => item.chart_type === "line1"),
+                data.filter(item => item.chart_type === "line2"),
+                data.filter(item => item.chart_type === "line3"),
+                data.filter(item => item.chart_type === "line4"),
+                data.filter(item => item.chart_type === "line5")
+            ];
+
+            // ✅ Render Charts
+            new Chart(document.getElementById('pieChart').getContext('2d'), {
+                type: 'pie',
+                data: { labels: pieData.map(item => item.category), datasets: [{ data: pieData.map(item => item.value), backgroundColor: getColors(pieData) }] }
+            });
+
+            new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: barData.map(item => item.category), datasets: [{ label: 'Values', data: barData.map(item => item.value), backgroundColor: getColors(barData) }] }
+            });
+
+            new Chart(document.getElementById('doughnutChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: doughnutData.map(item => item.category), datasets: [{ data: doughnutData.map(item => item.value), backgroundColor: getColors(doughnutData) }] }
+            });
+
+            const datasets = lineData.map((dataset, index) => ({
+                label: `Line ${index + 1}`,
+                data: dataset.map(item => item.value),
+                borderColor: colors[index % colors.length],
+                fill: false
+            }));
+
+            new Chart(document.getElementById('lineChart').getContext('2d'), {
+                type: 'line',
+                data: { labels: lineData[0].map(item => item.category), datasets: datasets }
+            });
+
+
+
+
+        } catch (error) {
+            console.error("Error fetching chart data:", error);
+        }
+    });
+
+
+
+
+    </script>
+{% endblock %}

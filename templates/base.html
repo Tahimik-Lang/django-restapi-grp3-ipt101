@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+
+    <style>
+    /* ✅ Reset and General Styling */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+    }
+
+    /* ✅ Sidebar */
+   .sidebar {
+    width: 250px;
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+    overflow-y: auto; /* ✅ Scrollable for longer navigation */
+    transition: width 0.3s; /* ✅ Smooth transition for collapsible effect */
+}
+   button:active {
+    background-color: #4CAF50; /* ✅ Turns Green When Clicked */
+    color: white;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 10px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 6px;
+    transition: background 0.3s ease-in-out;
+}
+
+.sidebar ul li a:hover {
+    background: rgba(255, 255, 255, 0.2); /* ✅ Hover effect */
+}
+
+.sidebar ul li a.active {
+    background: #4CAF50; /* ✅ Highlight active page */
+}
+
+.sidebar ul li a i {
+    margin-right: 10px; /* ✅ Space between icon and text */
+}
+
+/* ✅ Collapsible Sidebar */
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar.collapsed ul li a span {
+    display: none; /* ✅ Hide text when collapsed */
+}
+
+.sidebar ul li a.active {
+    background: #4CAF50; /* ✅ Turns green when active */
+    color: white;
+}
+    /* ✅ Main Dashboard */
+    .dashboard {
+        margin-left: 270px;
+        padding: 20px;
+        flex-grow: 1;
+    }
+
+    /* ✅ Chart & Management Layout */
+    .chart-section {
+        display: flex;
+        justify-content: space-between; /* ✅ Proper separation */
+        align-items: flex-start;
+        gap: 50px; /* ✅ Increased gap for better spacing */
+        padding: 20px;
+    }
+
+    .chart-box {
+        flex: 1;
+        max-width: 450px; /* ✅ Matches the CRUD panel */
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .crud-panel {
+        flex: 1;
+        max-width: 450px; /* ✅ Matches chart-box */
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .crud-panel form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .crud-panel input {
+        width: 80%;
+        padding: 8px;
+    }
+
+    /* ✅ Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    table th, table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    /* ✅ Button Enhancements */
+   button {
+    padding: 10px 14px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.1s;
+}
+
+button:hover {
+    opacity: 0.8;
+    transform: scale(1.05); /* ✅ Adds slight hover effect */
+}
+
+button:active {
+    background-color: #388E3C; /* ✅ Darker green when clicked */
+}
+
+.add-btn { background: #4CAF50; color: white; }
+.edit-btn { background: #FFC107; color: black; }
+.delete-btn { background: #F44336; color: white; }
+
+/* ✅ Styled Dropdown */
+select#chartType {
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 6px;
+    border: 2px solid #4CAF50;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+/* ✅ Hover Effect */
+select#chartType:hover {
+    background-color: #f8f9fa;
+    border-color: #388E3C;
+}
+
+/* ✅ Focus Effect */
+select#chartType:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
+}
+
+/* ✅ Dropdown Arrow Styling */
+select#chartType::-ms-expand {
+    display: none; /* ✅ Hide default arrow in IE */
+}
+
+select#chartType {
+    appearance: none; /* ✅ Removes default dropdown styling */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#4CAF50" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 7.5l4.5 4.5 4.5-4.5" /></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+/* ✅ Centered Dashboard Title */
+.dashboard-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    padding: 20px;
+}
+
+/* ✅ Grid Layout Fix */
+.container-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* ✅ 2x2 layout */
+    grid-gap: 20px;
+    justify-items: center;
+    padding: 20px;
+}
+
+/* ✅ Unified Chart Panel Styling */
+.chart-container {
+    max-width: 450px; /* ✅ Matches Bar and Line charts */
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* ✅ Standardized Chart Sizes */
+canvas {
+    max-width: 100%;
+    height: 280px; /* ✅ Matches all chart types */
+}
+
+</style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+        <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
+        <li><a href="{% url 'pie_chart' %}" class="{% if '/pie' in request.path %}active{% endif %}">Pie Chart</a></li>
+        <li><a href="{% url 'bar_chart' %}" class="{% if '/bar' in request.path %}active{% endif %}">Bar Chart</a></li>
+        <li><a href="{% url 'doughnut_chart' %}" class="{% if '/doughnut' in request.path %}active{% endif %}">Doughnut Chart</a></li>
+        <li><a href="{% url 'line_chart' %}" class="{% if '/line' in request.path %}active{% endif %}">Line Chart</a></li>
+    </ul>
+</aside>
+
+
+
+
+
+    <!-- Main Content -->
+    <main class="dashboard">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
