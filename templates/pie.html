@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Pie Chart{% endblock %}
+
+{% block content %}
+    <main class="dashboard">
+        <h1>Pie Chart Visualization</h1>
+
+        <div class="chart-section">
+            <!-- Pie Chart Container -->
+            <div class="chart-box">
+                <canvas id="pieChart"></canvas>
+            </div>
+
+            <!-- CRUD Panel -->
+            <div class="crud-panel">
+                <h2>Manage Data</h2>
+
+                <!-- Form -->
+                <form id="chartForm">
+                    <input type="text" id="category" placeholder="Category">
+                    <input type="number" id="value" placeholder="Value">
+                    <button type="button" class="add-btn" onclick="addChart()">Add</button>
+                </form>
+
+                <!-- Table for Chart Data -->
+                <table id="chartTable">
+                    <tr>
+                        <th>Category</th>
+                        <th>Value</th>
+                        <th>Actions</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            // ✅ Fetch Data from API
+            const response = await fetch("/dept1/api/chart-data/");
+            const data = await response.json();
+
+            // ✅ Extract Only Pie Chart Data
+            const pieData = data.filter(item => item.chart_type === "pie");
+
+            // ✅ Define Colors for Pie Chart
+            const colors = [
+                '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0',
+                '#9966ff', '#ff9f40', '#ffcd56', '#c9cbcf',
+                '#7dd3fc', '#c0ca33'
+            ];
+
+            // ✅ Assign Colors Dynamically
+            function getColors(data) {
+                return data.map((_, index) => colors[index % colors.length]);
+            }
+
+            // ✅ Render Pie Chart
+            new Chart(document.getElementById('pieChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: pieData.map(item => item.category),
+                    datasets: [{ data: pieData.map(item => item.value), backgroundColor: getColors(pieData) }]
+                }
+            });
+
+            // ✅ Populate Table
+            const table = document.getElementById("chartTable");
+            table.innerHTML = "<tr><th>Category</th><th>Value</th><th>Actions</th></tr>";
+
+            pieData.forEach(item => {
+                const row = table.insertRow();
+                row.insertCell(0).innerText = item.category;
+                row.insertCell(1).innerText = item.value;
+                row.insertCell(2).innerHTML = `
+                    <button class="edit-btn" onclick="editChart(${item.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteChart(${item.id})">Delete</button>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Error fetching chart data:", error);
+        }
+    });
+
+    // ✅ Add Chart Data
+    async function addChart() {
+        const category = document.getElementById("category").value;
+        const value = document.getElementById("value").value;
+
+        await fetch("/dept1/api/chart-data/add/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category, value, chart_type: "pie" })
+        });
+
+        location.reload();
+    }
+
+    // ✅ Edit Chart Data
+    async function editChart(id) {
+        const category = prompt("Enter new category:");
+        const value = prompt("Enter new value:");
+
+        await fetch(`/dept1/api/chart-data/update/${id}/`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category, value })
+        });
+
+        location.reload();
+    }
+
+    // ✅ Delete Chart Data
+    async function deleteChart(id) {
+        await fetch(`/dept1/api/chart-data/delete/${id}/`, {
+            method: "DELETE"
+        });
+
+        location.reload();
+    }
+    </script>
+{% endblock %}

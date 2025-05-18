@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Bar Chart{% endblock %}
+
+{% block content %}
+    <main class="dashboard">
+        <h1>Bar Chart Visualization</h1>
+
+        <div class="chart-section">
+            <!-- Bar Chart Container (Now Separate) -->
+            <div class="chart-box">
+                <canvas id="barChart"></canvas>
+            </div>
+
+            <!-- CRUD Panel (Separated from Chart) -->
+            <div class="crud-panel">
+                <h2>Manage Data</h2>
+
+                <!-- Form -->
+                <form id="chartForm">
+                    <input type="text" id="category" placeholder="Category">
+                    <input type="number" id="value" placeholder="Value">
+                    <button type="button" class="add-btn" onclick="addChart()">Add</button>
+                </form>
+
+                <!-- Table for Chart Data -->
+                <table id="chartTable">
+                    <tr>
+                        <th>Category</th>
+                        <th>Value</th>
+                        <th>Actions</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        try {
+            // ✅ Fetch Data from API
+            const response = await fetch("/dept1/api/chart-data/");
+            const data = await response.json();
+            const barData = data.filter(item => item.chart_type === "bar");
+
+            // ✅ Define Colors
+            const colors = [
+                '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', // Original 4
+                '#9966ff', '#ff9f40', '#ffcd56', '#c9cbcf', // New additions
+                '#7dd3fc', '#c0ca33'  // Extra shades
+            ];
+
+            // ✅ Extract Categories & Values Dynamically
+            const barCategories = barData.map(item => item.category);
+            const barValues = barData.map(item => item.value);
+            const barColors = barCategories.map((_, index) => colors[index % colors.length]);
+
+            // ✅ Render Chart (Ensures New Categories Show Up)
+            new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: barCategories, // ✅ Categories dynamically update
+                    datasets: [{
+                        label: 'Values',
+                        data: barValues,
+                        backgroundColor: barColors
+                    }]
+                }
+            });
+
+            // ✅ Populate Table
+            const table = document.getElementById("chartTable");
+            table.innerHTML = "<tr><th>Category</th><th>Value</th><th>Actions</th></tr>";
+
+            barData.forEach(item => {
+                const row = table.insertRow();
+                row.insertCell(0).innerText = item.category;
+                row.insertCell(1).innerText = item.value;
+                row.insertCell(2).innerHTML = `
+                    <button class="edit-btn" onclick="editChart(${item.id})">Edit</button>
+                    <button class="delete-btn" onclick="deleteChart(${item.id})">Delete</button>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Error fetching chart data:", error);
+        }
+    });
+
+    // ✅ Add Chart Data
+    async function addChart() {
+        const category = document.getElementById("category").value;
+        const value = document.getElementById("value").value;
+
+        await fetch("/dept1/api/chart-data/add/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category, value, chart_type: "bar" })
+        });
+
+        location.reload();
+    }
+
+    // ✅ Edit Chart Data
+    async function editChart(id) {
+        const category = prompt("Enter new category:");
+        const value = prompt("Enter new value:");
+
+        await fetch(`/dept1/api/chart-data/update/${id}/`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category, value })
+        });
+
+        location.reload();
+    }
+
+    // ✅ Delete Chart Data
+    async function deleteChart(id) {
+        await fetch(`/dept1/api/chart-data/delete/${id}/`, {
+            method: "DELETE"
+        });
+
+        location.reload();
+    }
+    </script>
+{% endblock %}
