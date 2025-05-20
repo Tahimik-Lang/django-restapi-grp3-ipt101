@@ -8,4 +8,4 @@ class ChartData(models.Model):
     preferred_category = models.CharField(max_length=100, blank=True)  # Optional preferred category
 
     def __str__(self):
-        return f" {self.username} - {self.category}: {self.value} ({self.chart_type})"
+        return f" {self.username} - {self.preferred_category}: {self.value} ({self.chart_type})"

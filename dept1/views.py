@@ -67,9 +67,10 @@ def add_chart_data(request):
     category = request.data.get('category')
     value = request.data.get('value')
     chart_type = request.data.get('chart_type')
-
-    if category and value and chart_type:
-        ChartData.objects.create(category=category, value=value, chart_type=chart_type)
+    username=request.data.get('username', 'anonymous'), # Default to "anonymous" if no username
+    preferred_category = request.data.get('preferred_category')
+    if category and value and chart_type and username and preferred_category:
+        ChartData.objects.create(category=category, value=value, chart_type=chart_type, username=username, preferred_category=preferred_category)
         return Response({"message": "Chart data added successfully!"}, status=201)
 
     return Response({"error": "Invalid data"}, status=400)
@@ -81,6 +82,7 @@ def add_chart_data(request):
         category=data['category'],
         value=data['value'],
         chart_type=data['chart_type'],
+        username=["username", "anonymous"],  # Default to "anonymous" if no username
         preferred_category=data['category']  # Use the category as preferred_category
     )
     return JsonResponse({'id': chart_data.id})
@@ -94,6 +96,9 @@ def update_chart_data(request, id):
         chart_entry.category = request.data.get('category', chart_entry.category)
         chart_entry.value = request.data.get('value', chart_entry.value)
         chart_entry.chart_type = request.data.get('chart_type', chart_entry.chart_type)
+        chart_entry.username = request.data.get('username', chart_entry.username)
+        chart_entry.preferred_category = request.data.get('preferred_category', chart_entry.preferred_category)
+
         chart_entry.save()
         return Response({"message": "Chart data updated successfully!"})
     except ChartData.DoesNotExist:
@@ -114,6 +119,12 @@ def delete_chart_data(request, id):
 
 
 
+
+
+
+
+
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def add_chart_data(request):
@@ -121,7 +132,9 @@ def add_chart_data(request):
     obj = ChartData.objects.create(
         category=body.get("category"),
         value=body.get("value"),
-        chart_type=body.get("chart_type")
+        chart_type=body.get("chart_type"),
+        username=body.get("username", "anonymous"),  # Default to "anonymous" if no username
+        preferred_category=body.get('preferred_category')
     )
     return JsonResponse({"id": obj.id, "status": "added"})
 
@@ -131,7 +144,9 @@ def update_chart_data(request, id):
     body = json.loads(request.body)
     ChartData.objects.filter(id=id).update(
         category=body.get("category"),
-        value=body.get("value")
+        value=body.get("value"),
+        username=body.get("username", "anonymous"),  # Default to "anonymous" if no username
+        preferred_category=body.get("preferred_category")
     )
     return JsonResponse({"id": id, "status": "updated"})
 
