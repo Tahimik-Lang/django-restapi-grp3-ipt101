@@ -1,122 +1,208 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Dashboard{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1 class="dashboard-title">Dashboard</h1>
+    <main class="dashboard">
+        <h1>Preferred Categories Distribution</h1>
 
-    <div class="container-grid">
-        <div class="chart-box">
-            <h3>Pie Chart</h3>
-            <canvas id="pieChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <h3>Bar Chart</h3>
-            <canvas id="barChart"></canvas>
-        </div>
-        <div class="chart-box">
-            <h3>Doughnut Chart</h3>
-            <canvas id="doughnutChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <h3>Line Chart</h3>
-            <canvas id="lineChart"></canvas>
-        </div>
-    </div>
+        <div class="chart-section">
+            <!-- Bar Chart Container -->
+            <div class="chart-box">
+                <canvas id="categoryChart"></canvas>
+            </div>
 
-<!--<form id="chartForm">-->
-<!--    <input type="text" id="category" placeholder="Category">-->
-<!--    <input type="number" id="value" placeholder="Value">-->
-<!--    <input type="text" id="chart_type" placeholder="Chart Type"> &lt;!&ndash; New text box &ndash;&gt;-->
-<!--    <button type="button" class="add-btn" onclick="addChart()">Add</button>-->
-<!--</form>-->
+            <!-- Pie Chart Container -->
+            <div class="chart-container">
+                <h2>Preferred Categories Distribution</h2>
+                <canvas id="preferredCategoryPie"></canvas>
+            </div>
 
-    <form id="chartForm" style="margin: 20px auto; max-width: 400px; display: flex; gap: 10px; align-items: center;">
-        <input type="text" id="category" placeholder="Category" required>
-        <input type="number" id="value" placeholder="Value" required>
-        <select id="chart_type" required>
-            <option value="" disabled selected>Select Chart Type</option>
-            <option value="pie">Pie</option>
-            <option value="bar">Bar</option>
-            <option value="doughnut">Doughnut</option>
-            <option value="line1">Line 1</option>
-            <option value="line2">Line 2</option>
-            <option value="line3">Line 3</option>
-            <option value="line4">Line 4</option>
-            <option value="line5">Line 5</option>
-        </select>
-        <button type="button" class="add-btn" onclick="addChart()">Add</button>
-    </form>
 
+
+        </div>
+        <div class="chart-section">
+                        <!-- Add this section for the doughnut chart -->
+            <div class="chart-box">
+                <h2>Preferred Categories Distribution</h2>
+                <canvas id="doughnutChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
     document.addEventListener("DOMContentLoaded", async function () {
         try {
-            // ✅ Fetch Data from API
-            const response = await fetch("{% url 'chart_data_api' %}");
+            // Fetch data from API
+            const response = await fetch("/dept1/api/chart-data/");
             const data = await response.json();
 
-            // ✅ Define Color Palette
-            const colors = [
-                '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0',
-                '#9966ff', '#ff9f40', '#ffcd56', '#c9cbcf',
-                '#7dd3fc', '#c0ca33'
-            ];
-
-            function getColors(data) {
-                return data.map((_, index) => colors[index % colors.length]);
-            }
-
-            // ✅ Process Chart Data
-            const pieData = data.filter(item => item.chart_type === "pie");
-            const barData = data.filter(item => item.chart_type === "bar");
-            const doughnutData = data.filter(item => item.chart_type === "doughnut");
-            const lineData = [
-                data.filter(item => item.chart_type === "line1"),
-                data.filter(item => item.chart_type === "line2"),
-                data.filter(item => item.chart_type === "line3"),
-                data.filter(item => item.chart_type === "line4"),
-                data.filter(item => item.chart_type === "line5")
-            ];
-
-            // ✅ Render Charts
-            new Chart(document.getElementById('pieChart').getContext('2d'), {
-                type: 'pie',
-                data: { labels: pieData.map(item => item.category), datasets: [{ data: pieData.map(item => item.value), backgroundColor: getColors(pieData) }] }
+            // Count occurrences of each preferred_category
+            const categoryCount = {};
+            data.forEach(item => {
+                const category = item.preferred_category;
+                categoryCount[category] = (categoryCount[category] || 0) + 1;
             });
 
-            new Chart(document.getElementById('barChart').getContext('2d'), {
+            // Prepare data for chart
+            const categories = Object.keys(categoryCount);
+            const counts = Object.values(categoryCount);
+
+            // Define colors
+            const backgroundColor = '#4CAF50';
+
+            // Create bar chart
+            new Chart(document.getElementById('categoryChart').getContext('2d'), {
                 type: 'bar',
-                data: { labels: barData.map(item => item.category), datasets: [{ label: 'Values', data: barData.map(item => item.value), backgroundColor: getColors(barData) }] }
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Number of Entries',
+                        data: counts,
+                                            backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Category Distribution'
+                        }
+                    }
+                }
             });
 
-            new Chart(document.getElementById('doughnutChart').getContext('2d'), {
-                type: 'doughnut',
-                data: { labels: doughnutData.map(item => item.category), datasets: [{ data: doughnutData.map(item => item.value), backgroundColor: getColors(doughnutData) }] }
-            });
 
-            const datasets = lineData.map((dataset, index) => ({
-                label: `Line ${index + 1}`,
-                data: dataset.map(item => item.value),
-                borderColor: colors[index % colors.length],
-                fill: false
-            }));
+            // add pie chart
+            // Fetch data from your API endpoint
+            fetch('/dept1/api/chart-data/')
+                .then(response => response.json())
+                .then(data => {
+                    // Process data to count preferred categories
+                    const categoryCount = {};
+                    data.forEach(item => {
+                        const category = item.preferred_category || 'Uncategorized';
+                        categoryCount[category] = (categoryCount[category] || 0) + 1;
+                    });
 
-            new Chart(document.getElementById('lineChart').getContext('2d'), {
-                type: 'line',
-                data: { labels: lineData[0].map(item => item.category), datasets: datasets }
-            });
+                    // Calculate percentages
+                    const total = Object.values(categoryCount).reduce((a, b) => a + b, 0);
+                    const categories = Object.keys(categoryCount);
+                    const values = categories.map(cat => (categoryCount[cat] / total) * 100);
 
+                    // Create pie chart
+                    const ctx = document.getElementById('preferredCategoryPie').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: categories,
+                            datasets: [{
+                                data: values,
+                                backgroundColor: [
+                                    '#FF6384',
+                                    '#36A2EB',
+                                    '#FFCE56',
+                                    '#4BC0C0',
+                                    '#9966FF'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const value = context.raw.toFixed(1);
+                                            return `${context.label}: ${value}%`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
 
+                // Add this after your existing charts
+                fetch('/dept1/api/chart-data/')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Count occurrences of each preferred category
+                        const categoryCount = {};
+                        data.forEach(item => {
+                            const category = item.preferred_category || 'Uncategorized';
+                            categoryCount[category] = (categoryCount[category] || 0) + 1;
+                        });
 
+                        // Prepare data for doughnut chart
+                        const labels = Object.keys(categoryCount);
+                        const values = Object.values(categoryCount);
+                        const total = values.reduce((sum, value) => sum + value, 0);
+
+                        // Calculate percentages
+                        const percentages = values.map(value => ((value / total) * 100).toFixed(1));
+
+                        // Create labels with percentages
+                        const labelsWithPercentages = labels.map((label, index) =>
+                            `${label} (${percentages[index]}%)`);
+
+                        const doughnutChart = new Chart(
+                            document.getElementById('doughnutChart'),
+                            {
+                                type: 'doughnut',
+                                data: {
+                                    labels: labelsWithPercentages,
+                                    datasets: [{
+                                        data: values,
+                                        backgroundColor: [
+                                            '#FF6384',
+                                            '#36A2EB',
+                                            '#FFCE56',
+                                            '#4BC0C0',
+                                            '#9966FF'
+                                        ]
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom'
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Distribution of Preferred Categories'
+                                        }
+                                    }
+                                }
+                            }
+                        );
+                    });
 
         } catch (error) {
             console.error("Error fetching chart data:", error);
         }
     });
-
-
-
-
     </script>
 {% endblock %}
