@@ -3,8 +3,82 @@
 {% block title %}Line Chart{% endblock %}
 
 {% block content %}
+   <style>
+       .dashboard {
+    padding: 40px;
+    max-width: 1800px;
+    margin: 0 auto;
+    margin-left: 180px;
+}
+
+.chart-section {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center horizontally */
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.charts-container {
+    display: flex;
+    justify-content: center; /* Center the charts */
+    gap: 40px;
+    width: 100%;
+}
+
+.chart-box {
+    flex: 1;
+    background: white;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    min-width: 400px;
+    max-width: 500px; /* Limit maximum width */
+}
+
+.crud-panel {
+    width: 80%; /* Take up most of the width but not all */
+    max-width: 1200px; /* Maximum width for the CRUD panel */
+    background: white;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    margin-top: 30px;
+}
+
+.chart-box h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.3rem;
+    padding: 0 15px;
+}
+
+canvas {
+    width: 100% !important;
+    height: 450px !important;
+    padding: 10px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#dataTable {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+}
+
+#dataTable th,
+#dataTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+   </style>
     <main class="dashboard">
-        <h1>Line Chart Visualization</h1>
+        <h1>Line Chart Trend of Preferred Categories</h1>
 
         <div class="chart-section">
             <!-- Line Chart Container -->
