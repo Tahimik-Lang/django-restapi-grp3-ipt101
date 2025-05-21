@@ -381,7 +381,7 @@ document.getElementById('chartForm').addEventListener('submit', async function(e
 
     const formData = {
         username: document.getElementById('username').value,
-        preferred_category: document.getElementById('preferred_category').value
+        preferred_category: document.getElementById('preferred_category').value.toUpperCase()
     };
 
     try {
@@ -461,7 +461,7 @@ document.getElementById('updateBtn').addEventListener('click', async function() 
 
     const formData = {
         username: document.getElementById('username').value,
-        preferred_category: document.getElementById('preferred_category').value
+        preferred_category: document.getElementById('preferred_category').value.toUpperCase()
     };
 
     try {

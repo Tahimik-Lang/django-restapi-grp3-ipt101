@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95d2c002-6fd7-4651-bb9e-92bd3ccdf138" name="Changes" comment="">
+    <list default="true" id="95d2c002-6fd7-4651-bb9e-92bd3ccdf138" name="Changes" comment="Graphs Repaired with Design&#10;&#10;*fixed logic with correct display for bar.html, doughnut.html, pie.html&#10;&#10;*home.html fixed.&#10;&#10;*base.html:&#10;     &gt;removed line-chart nav&#10;     &gt;Changed name&#10;&#10;⚠️Not responsive to all pages.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dept1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/dept1/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dept1/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dept1/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/bar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/doughnut.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/doughnut.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/line.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/line.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/pie.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/pie.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,6 +66,19 @@
       <option name="presentableId" value="Default" />
       <updated>1747583674254</updated>
     </task>
+    <task id="LOCAL-00001" summary="Graphs Repaired with Design&#10;&#10;*fixed logic with correct display for bar.html, doughnut.html, pie.html&#10;&#10;*home.html fixed.&#10;&#10;*base.html:&#10;     &gt;removed line-chart nav&#10;     &gt;Changed name&#10;&#10;⚠️Not responsive to all pages.">
+      <option name="closed" value="true" />
+      <created>1747821655212</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747821655212</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Graphs Repaired with Design&#10;&#10;*fixed logic with correct display for bar.html, doughnut.html, pie.html&#10;&#10;*home.html fixed.&#10;&#10;*base.html:&#10;     &gt;removed line-chart nav&#10;     &gt;Changed name&#10;&#10;⚠️Not responsive to all pages." />
+    <option name="LAST_COMMIT_MESSAGE" value="Graphs Repaired with Design&#10;&#10;*fixed logic with correct display for bar.html, doughnut.html, pie.html&#10;&#10;*home.html fixed.&#10;&#10;*base.html:&#10;     &gt;removed line-chart nav&#10;     &gt;Changed name&#10;&#10;⚠️Not responsive to all pages." />
   </component>
 </project>
