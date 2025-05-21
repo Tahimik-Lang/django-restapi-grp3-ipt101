@@ -2,69 +2,65 @@
 
 {% block title %}Home{% endblock %}
 
+
 {% block content %}
-    <main class="dashboard">
-        <h1>Preferred Categories Distribution</h1>
+<style>
+.dashboard {
+    padding: 30px;
+    max-width: 1800px;
+    margin: 0 auto;
+    margin-left: 150px; /* Increased margin-left to accommodate side navigation */
+}
 
-        <div class="chart-section">
-            <!-- Bar Chart Container -->
-            <div class="chart-box">
-                <canvas id="categoryChart"></canvas>
-            </div>
+.chart-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px; /* Increased gap between charts */
+    margin-bottom: 40px;
+}
 
-            <!-- Pie Chart Container -->
-            <div class="chart-container">
-                <h2>Preferred Categories Distribution</h2>
-                <canvas id="preferredCategoryPie"></canvas>
-            </div>
+.chart-box {
+    flex: 1;
+    background: white;
+    padding: 25px; /* Increased padding */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-width: 0;
+}
 
+.chart-box h2 {
+    text-align: center;
+    margin-bottom: 20px; /* Increased margin */
+    font-size: 1.2rem; /* Slightly larger font */
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+canvas {
+    width: 100% !important;
+    height: 400px !important; /* Increased height */
+}
+</style>
+<main class="dashboard">
+    <h1>Overview of User Category Preferences</h1>
+    <div class="chart-section">
+        <!-- Bar Chart Container -->
+        <div class="chart-box">
+            <h2>Frequency of Preferred Categories</h2>
+            <canvas id="categoryChart"></canvas>
         </div>
-        <div class="chart-section">
-                        <!-- Add this section for the doughnut chart -->
-            <div class="chart-box">
-                <h2>Preferred Categories Distribution</h2>
-                <canvas id="doughnutChart"></canvas>
-            </div>
+
+        <!-- Pie Chart Container -->
+        <div class="chart-box">
+            <h2>Percentage Distribution of Preferred Categories</h2>
+            <canvas id="preferredCategoryPie"></canvas>
         </div>
-    </main>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        <!-- Doughnut Chart Container -->
+        <div class="chart-box">
+            <h2>Category Preferences by Percentage</h2>
+            <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+</main>
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -83,44 +79,14 @@
                 categoryCount[category] = (categoryCount[category] || 0) + 1;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             });
 
             // Prepare data for chart
             const categories = Object.keys(categoryCount);
             const counts = Object.values(categoryCount);
 
-
             // Define colors
             const backgroundColor = '#4CAF50';
-
-
-
-
-
-
-
-
-
 
             // Create bar chart
             new Chart(document.getElementById('categoryChart').getContext('2d'), {
@@ -152,12 +118,11 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Category Distribution'
+
                         }
                     }
                 }
             });
-
 
             // add pie chart
             // Fetch data from your API endpoint
@@ -259,9 +224,7 @@
                                             position: 'bottom'
                                         },
                                         title: {
-                                            display: true,
-                                            text: 'Distribution of Preferred Categories'
-                                        }
+                                            display: true                                        }
                                     }
                                 }
                             }
@@ -272,9 +235,6 @@
             console.error("Error fetching chart data:", error);
         }
     });
-
-
-
 
     </script>
 {% endblock %}

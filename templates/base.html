@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="styles.css">
 
     <style>
-    /* ✅ Reset and General Styling */
+/* ✅ Reset and General Styling */
     body {
         margin: 0;
         font-family: Arial, sans-serif;
@@ -241,13 +242,12 @@ canvas {
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
-    <h2>Navigation</h2>
+    <h2>Categorista Analytics</h2>
     <ul>
         <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
         <li><a href="{% url 'pie_chart' %}" class="{% if '/pie' in request.path %}active{% endif %}">Pie Chart</a></li>
         <li><a href="{% url 'bar_chart' %}" class="{% if '/bar' in request.path %}active{% endif %}">Bar Chart</a></li>
         <li><a href="{% url 'doughnut_chart' %}" class="{% if '/doughnut' in request.path %}active{% endif %}">Doughnut Chart</a></li>
-        <li><a href="{% url 'line_chart' %}" class="{% if '/line' in request.path %}active{% endif %}">Line Chart</a></li>
     </ul>
 </aside>
 

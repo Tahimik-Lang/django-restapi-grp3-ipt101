@@ -3,6 +3,82 @@
 {% block title %}Bar Chart{% endblock %}
 
 {% block content %}
+    <link rel="stylesheet" href="styles.css">
+
+<style>
+    .dashboard {
+    padding: 40px;
+    max-width: 1800px;
+    margin: 0 auto;
+    margin-left: 180px;
+}
+
+.chart-section {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center horizontally */
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+.charts-container {
+    display: flex;
+    justify-content: center; /* Center the charts */
+    gap: 40px;
+    width: 100%;
+}
+
+.chart-box {
+    flex: 1;
+    background: white;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    min-width: 400px;
+    max-width: 500px; /* Limit maximum width */
+}
+
+.crud-panel {
+    width: 80%; /* Take up most of the width but not all */
+    max-width: 1200px; /* Maximum width for the CRUD panel */
+    background: white;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    margin-top: 30px;
+}
+
+.chart-box h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.3rem;
+    padding: 0 15px;
+}
+
+canvas {
+    width: 100% !important;
+    height: 450px !important;
+    padding: 10px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#dataTable {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+}
+
+#dataTable th,
+#dataTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+</style>
     <main class="dashboard">
         <h1>Bar Chart Visualization</h1>
 
@@ -12,33 +88,52 @@
                 <canvas id="barChart"></canvas>
             </div>
 
-            <!-- Replace your existing CRUD panel with this enhanced version -->
+<!--            &lt;!&ndash; Replace your existing CRUD panel with this enhanced version &ndash;&gt;-->
+<!--            <div class="crud-panel">-->
+<!--                <h2>Manage Chart Data</h2>-->
+<!--                <form id="chartForm">-->
+<!--                    <input type="hidden" id="editId">-->
+<!--                    <div class="form-group">-->
+<!--                        <input type="text" id="username" placeholder="Username" required>-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <input type="text" id="preferred_category" placeholder="Preferred Category (e.g., Action, RPG)" required>-->
+<!--                    </div>-->
+<!--                    <div class="button-group">-->
+<!--                        <button type="submit" class="add-btn" id="submitBtn">Add Data</button>-->
+<!--                        <button type="button" class="clear-btn" onclick="clearForm()">Clear Form</button>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            -->
+<!--                <div class="table-container">-->
+<!--                    <h3>Current Data</h3>-->
+<!--                    <table id="dataTable">-->
+<!--                        <thead>-->
+<!--                            <tr>-->
+<!--                                <th>Username</th>-->
+<!--                                <th>Preferred Category</th>-->
+<!--                                <th>Actions</th>-->
+<!--                            </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody></tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <!-- Update your CRUD form section -->
 <div class="crud-panel">
     <h2>Manage Chart Data</h2>
     <form id="chartForm">
         <input type="hidden" id="editId">
         <div class="form-group">
-            <input type="text" id="category" placeholder="Category (e.g., A, B, C)" required>
-        </div>
-        <div class="form-group">
-            <input type="number" id="value" placeholder="Value (e.g., 1-100)" required min="0" max="100">
-        </div>
-        <div class="form-group">
-            <input type="text" id="username" placeholder="Username" value="anonymous">
-        </div>
-        <div class="form-group">
-            <select id="chartType" required>
-                <option value="bar">Bar Chart</option>
-                <option value="pie">Pie Chart</option>
-                <option value="doughnut">Doughnut Chart</option>
-                <option value="line">Line Chart</option>
-            </select>
+            <input type="text" id="username" placeholder="Username" required>
         </div>
         <div class="form-group">
             <input type="text" id="preferred_category" placeholder="Preferred Category (e.g., Action, RPG)" required>
         </div>
         <div class="button-group">
             <button type="submit" class="add-btn" id="submitBtn">Add Data</button>
+            <button type="button" class="edit-btn" id="updateBtn" style="display: none;">Update Data</button>
             <button type="button" class="clear-btn" onclick="clearForm()">Clear Form</button>
         </div>
     </form>
@@ -48,11 +143,8 @@
         <table id="dataTable">
             <thead>
                 <tr>
-                    <th>Category</th>
-                    <th>Value</th>
-                    <th>Type</th>
                     <th>Username</th>
-                    <th>Preferred</th>
+                    <th>Preferred Category</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -122,8 +214,14 @@
                         datasets: [{
                             label: 'Number of Entries',
                             data: counts,
-                            backgroundColor: '#4CAF50'
-                        }]
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ]
+                                        }]
                     },
                     options: {
                         responsive: true,
@@ -144,20 +242,19 @@
                 });
 
                 // Update table
-                const tbody = document.querySelector('#dataTable tbody');
-                tbody.innerHTML = '';
-                data.forEach(item => {
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>${item.category}</td>
-                        <td>${item.value}</td>
-                        <td>${item.username}</td>
-                        <td>
-                            <button class="edit-btn" onclick="editData(${item.id})">Edit</button>
-                            <button class="delete-btn" onclick="deleteData(${item.id})">Delete</button>
-                        </td>
-                    `;
-                });
+const tbody = document.querySelector('#dataTable tbody');
+tbody.innerHTML = '';
+data.forEach(item => {
+    const row = tbody.insertRow();
+    row.innerHTML = `
+        <td>${item.username}</td>
+        <td>${item.preferred_category}</td>
+        <td>
+            <button class="edit-btn" onclick="editData(${item.id})">Edit</button>
+            <button class="delete-btn" onclick="deleteData(${item.id})">Delete</button>
+        </td>
+    `;
+});
             } catch (error) {
                 console.error("Error:", error);
             }
@@ -165,8 +262,6 @@
 
         // Add new data
         async function addData() {
-            const category = document.getElementById('category').value;
-            const value = document.getElementById('value').value;
             const username = document.getElementById('username').value;
             const preferred_category = document.getElementById('preferred_category').value;
 
@@ -175,9 +270,6 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        category,
-                        value: parseInt(value),
-                        chart_type: "bar",
                         username,
                         preferred_category
                     })
@@ -189,26 +281,24 @@
         }
 
         // Edit data
-        async function editData(id) {
-            const category = prompt("Enter new category:");
-            const value = prompt("Enter new value:");
-            const preferred_category = prompt("Enter new preferred category:");
+async function editData(id) {
+    try {
+        const response = await fetch('/dept1/api/chart-data/');
+        const data = await response.json();
+        const item = data.find(item => item.id === id);
 
-            try {
-                await fetch(`/dept1/api/chart-data/update/${id}/`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        category,
-                        value: parseInt(value),
-                        preferred_category
-                    })
-                });
-                fetchAndDisplayData();
-            } catch (error) {
-                console.error("Error:", error);
-            }
+        if (item) {
+            document.getElementById('editId').value = item.id;
+            document.getElementById('username').value = item.username;
+            document.getElementById('preferred_category').value = item.preferred_category;
+
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('updateBtn').style.display = 'block';
         }
+    } catch (error) {
+        console.error('Error fetching item:', error);
+    }
+}
 
         // Delete data
         async function deleteData(id) {
@@ -230,31 +320,87 @@
 
 <!-- Add this script after your existing scripts -->
 <script>
-// Form submission handler
+<!--// Form submission handler-->
+<!--document.getElementById('chartForm').addEventListener('submit', async function(e) {-->
+<!--    e.preventDefault();-->
+
+<!--    const formData = {-->
+<!--        username: document.getElementById('username').value,-->
+<!--        preferred_category: document.getElementById('preferred_category').value-->
+<!--    };-->
+
+<!--    try {-->
+<!--        await fetch('/dept1/api/chart-data/', {-->
+<!--            method: 'POST',-->
+<!--            headers: {-->
+<!--                'Content-Type': 'application/json',-->
+<!--            },-->
+<!--            body: JSON.stringify(formData)-->
+<!--        });-->
+
+<!--        clearForm();-->
+<!--        fetchAndDisplayData();-->
+<!--    } catch (error) {-->
+<!--        console.error('Error adding data:', error);-->
+<!--    }-->
+<!--});-->
+
+<!--function clearForm() {-->
+<!--    document.getElementById('chartForm').reset();-->
+<!--    document.getElementById('editId').value = '';-->
+<!--    document.getElementById('submitBtn').textContent = 'Add Data';-->
+<!--}-->
+
+<!--function populateForm(data) {-->
+<!--    document.getElementById('editId').value = data.id;-->
+<!--    document.getElementById('username').value = data.username;-->
+<!--    document.getElementById('preferred_category').value = data.preferred_category;-->
+<!--    document.getElementById('submitBtn').textContent = 'Update Data';-->
+<!--}-->
+
+<!--// Update your existing editData function-->
+<!--async function editData(id) {-->
+<!--    try {-->
+<!--        const response = await fetch(`/dept1/api/chart-data/`);-->
+<!--        const data = await response.json();-->
+<!--        const item = data.find(item => item.id === id);-->
+<!--        if (item) {-->
+<!--            populateForm(item);-->
+<!--        }-->
+<!--    } catch (error) {-->
+<!--        console.error('Error:', error);-->
+<!--        alert('An error occurred while fetching the data.');-->
+<!--    }-->
+<!--}-->
+
+
+    // Update your CRUD JavaScript functions
 document.getElementById('chartForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    const editId = document.getElementById('editId').value;
 
     const formData = {
-        category: document.getElementById('category').value,
-        value: parseInt(document.getElementById('value').value),
-        chart_type: document.getElementById('chartType').value,
-        username: document.getElementById('username').value || 'anonymous',
+        username: document.getElementById('username').value,
         preferred_category: document.getElementById('preferred_category').value
     };
 
-    const editId = document.getElementById('editId').value;
-
     try {
         if (editId) {
+            // Update existing record
             await fetch(`/dept1/api/chart-data/update/${editId}/`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(formData)
             });
         } else {
+            // Add new record
             await fetch('/dept1/api/chart-data/add/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(formData)
             });
         }
@@ -263,39 +409,75 @@ document.getElementById('chartForm').addEventListener('submit', async function(e
         fetchAndDisplayData();
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while saving the data.');
     }
 });
 
-function clearForm() {
-    document.getElementById('chartForm').reset();
-    document.getElementById('editId').value = '';
-    document.getElementById('submitBtn').textContent = 'Add Data';
-}
-
-function populateForm(data) {
-    document.getElementById('editId').value = data.id;
-    document.getElementById('category').value = data.category;
-    document.getElementById('value').value = data.value;
-    document.getElementById('chartType').value = data.chart_type;
-    document.getElementById('username').value = data.username;
-    document.getElementById('preferred_category').value = data.preferred_category;
-    document.getElementById('submitBtn').textContent = 'Update Data';
-}
-
-// Update your existing editData function
+// Edit data function
 async function editData(id) {
     try {
-        const response = await fetch(`/dept1/api/chart-data/`);
+        const response = await fetch('/dept1/api/chart-data/');
         const data = await response.json();
         const item = data.find(item => item.id === id);
+
         if (item) {
-            populateForm(item);
+            document.getElementById('editId').value = item.id;
+            document.getElementById('username').value = item.username;
+            document.getElementById('preferred_category').value = item.preferred_category;
+
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('updateBtn').style.display = 'block';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while fetching the data.');
     }
 }
+
+// Delete data function
+async function deleteData(id) {
+    if (confirm('Are you sure you want to delete this item?')) {
+        try {
+            await fetch(`/dept1/api/chart-data/delete/${id}/`, {
+                method: 'DELETE'
+            });
+            fetchAndDisplayData();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+}
+
+// Clear form function
+function clearForm() {
+    document.getElementById('chartForm').reset();
+    document.getElementById('editId').value = '';
+    document.getElementById('submitBtn').style.display = 'block';
+    document.getElementById('updateBtn').style.display = 'none';
+}
+
+// Update button handler
+document.getElementById('updateBtn').addEventListener('click', async function() {
+    const editId = document.getElementById('editId').value;
+    if (!editId) return;
+
+    const formData = {
+        username: document.getElementById('username').value,
+        preferred_category: document.getElementById('preferred_category').value
+    };
+
+    try {
+        await fetch(`/dept1/api/chart-data/update/${editId}/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        clearForm();
+        fetchAndDisplayData();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
 </script>
 {% endblock %}
